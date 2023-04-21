@@ -1,10 +1,5 @@
-#define SCL_PIN A5
-#define SCL_PORT PORTD
-#define SDA_PIN A3
-#define SDA_PORT PORTC
-
 #include <Wire.h>
-#include <LCDSoftI2C.h>
+#include <LiquidCrystal_I2C.h>
 
 // A0 Next
 // A1 Prev.
@@ -33,7 +28,7 @@ enum class Loc : unsigned short {
   	LIFESTYLE = 16u,
   	PUPPY = 32u,
   	FOOD = 64u,
-    GROOMING = 128u,
+    	GROOMING = 128u,
   	RAW_FOOD = FOOD,
   	WET_FOOD = FOOD | PUPPY,
   	DRY_FOOD = FOOD | PUPPY,
@@ -57,7 +52,7 @@ typedef struct {
 } LocPair;
 
 constexpr LocPair locTable[] = {
-	  {"Cafe", Loc::CAFE},
+    {"Cafe", Loc::CAFE},
     {"Dog Wash *", Loc::DOG_WASH},
     {"Disabled Toilet", Loc::DISABLED_TOILET},
     {"Walkies *", Loc::WALKING},
@@ -85,12 +80,12 @@ bool hasFlag(Loc val1, Loc val2) {
 }
 
 unsigned short countSetBits(unsigned short n) {
-  	unsigned short count = 0;
-    while (n) {
-        count += n & 1;
-        n >>= 1;
-    }
-    return count;
+	unsigned short count = 0;
+    	while (n) {
+        	count += n & 1;
+        	n >>= 1;
+    	}
+    	return count;
 }
 
 int *ledsForLoc(Loc loc) {
@@ -98,106 +93,106 @@ int *ledsForLoc(Loc loc) {
   	unsigned short length = countSetBits((unsigned short)loc);
   	// Allocate memory to store the series of LEDs.
   	static int *leds = nullptr;
-    if (leds) free(leds);
-    leds = (int *)malloc(sizeof(int) * length);   
+    	if (leds) free(leds);
+    	leds = (int *)malloc(sizeof(int) * length);   
 
   	unsigned short index = 0;
   	
   	// Adds the LED address for the corresponding location.
   	if (hasFlag(loc, Loc::CAFE)) {
-      	leds[index] = D2;
-      	index++;
+      		leds[index] = D2;
+      		index++;
   	}
   
   	if (hasFlag(loc, Loc::DOG_WASH)) {
-      	leds[index] = D3;
-      	index++;
+      		leds[index] = D3;
+      		index++;
   	}
         
-    if (hasFlag(loc, Loc::DISABLED_TOILET)) {
-      	leds[index] = D4;
-      	index++;
+   	if (hasFlag(loc, Loc::DISABLED_TOILET)) {
+      		leds[index] = D4;
+      		index++;
   	}
         
-    if (hasFlag(loc, Loc::WALKING)) {
-      	leds[index] = D5;
-      	index++;
+    	if (hasFlag(loc, Loc::WALKING)) {
+      		leds[index] = D5;
+      		index++;
   	}
         
-    if (hasFlag(loc, Loc::LIFESTYLE)) {
-      	leds[index] = D6;
-      	index++;
+    	if (hasFlag(loc, Loc::LIFESTYLE)) {
+      		leds[index] = D6;
+      		index++;
   	}
         
-    if (hasFlag(loc, Loc::PUPPY)) {
-      	leds[index] = D7;
-      	index++;
+    	if (hasFlag(loc, Loc::PUPPY)) {
+      		leds[index] = D7;
+      		index++;
   	}
         
    	if (hasFlag(loc, Loc::FOOD)) {
-      	leds[index] = D8;
-      	index++;
+      		leds[index] = D8;
+      		index++;
   	}
 
-    if (hasFlag(loc, Loc::GROOMING)) {
-        leds[index] = D9;
-        index++;        
-    }
-
+    	if (hasFlag(loc, Loc::GROOMING)) {
+        	leds[index] = D9;
+        	index++;        
+    	}
+	
   	return leds;
 }
 
 int strlen(char *str) {
-    if (str[0] == '\0')
-        return 0;
-    return 1 + strlen(str + 1);
+    	if (str[0] == '\0')
+        	return 0;
+    	return 1 + strlen(str + 1);
 }
 
-LCDSoftI2C lcd(0x27, 20, 4);
+LiquidCystal_I2C lcd(0x27, 20, 4);
 
 unsigned short length;
 
 int selected = 0;
 
 void updateLcd(void) {
-	  //lcd.clear();
+	lcd.clear();
 
-    LocPair selectedLoc = locTable[selected % length];
+    	LocPair selectedLoc = locTable[selected % length];
 
-    char *name = selectedLoc.name;
-    int nameOffset = (20 - strlen(name)) / 2;
-    lcd.setCursor(nameOffset, 1);
-    lcd.print(name);
+    	char *name = selectedLoc.name;
+    	int nameOffset = (20 - strlen(name)) / 2;
+    	lcd.setCursor(nameOffset, 1);
+    	lcd.print(name);
 
-    int selectionLength = 2;
-    int displaySelection = selected + 1;
-    if (displaySelection > 9) selectionLength++;
-    if (length > 9) selectionLength++;
+    	int selectionLength = 2;
+    	int displaySelection = selected + 1;
+    	if (displaySelection > 9) selectionLength++;
+    	if (length > 9) selectionLength++;
 
-    int selectionOffset = (20 - selectionLength) / 2;
-    lcd.setCursor(selectionOffset, 2);
-    int containedSelection = displaySelection % length;
-    lcd.print(containedSelection == 0 ? 21 : containedSelection);
-    lcd.print("/");
-    lcd.print(length);
+    	int selectionOffset = (20 - selectionLength) / 2;
+    	lcd.setCursor(selectionOffset, 2);
+    	int containedSelection = displaySelection % length;
+    	lcd.print(containedSelection == 0 ? 21 : containedSelection);
+    	lcd.print("/");
+    	lcd.print(length);
 }
 
 void resetLeds() {
-    digitalWrite(D2, LOW);
-    digitalWrite(D3, LOW);
-    digitalWrite(D4, LOW);
-    digitalWrite(D5, LOW);
-    digitalWrite(D6, LOW);
-    digitalWrite(D7, LOW);
-    digitalWrite(D8, LOW);
+	digitalWrite(D2, LOW);
+    	digitalWrite(D3, LOW);
+    	digitalWrite(D4, LOW);
+    	digitalWrite(D5, LOW);
+    	digitalWrite(D6, LOW);
+    	digitalWrite(D7, LOW);
+    	digitalWrite(D8, LOW);
 }
 
 void writeLeds() {
-    LocPair current = locTable[selected];
-    int *leds = ledsForLoc(current.loc);
-    for (int i = 0; i < sizeof(leds); i++) {
-      digitalWrite(leds[i], HIGH);
-    }
+    	LocPair current = locTable[selected];
+    	int *leds = ledsForLoc(current.loc);
+    	for (int i = 0; i < sizeof(leds); i++) {
+      		digitalWrite(leds[i], HIGH);
+    	}
 }
 
 const int LCD_COLS = 20;
@@ -207,28 +202,28 @@ const int LCD_ROWS = 4;
 /// START PROCEDURE
 ///
 void setup(void) {
-    Serial.begin(9600);
-    Serial.println("Setup Started.");
+    	Serial.begin(9600);
+    	Serial.println("Setup Started.");
 
-    pinMode(A0, INPUT_PULLUP);
-    pinMode(A1, INPUT_PULLUP);
-    pinMode(A2, INPUT_PULLUP);
+    	pinMode(A0, INPUT_PULLUP);
+    	pinMode(A1, INPUT_PULLUP);
+    	pinMode(A2, INPUT_PULLUP);
 
-    pinMode(D2, OUTPUT);
-    pinMode(D3, OUTPUT);
-    pinMode(D4, OUTPUT);
-    pinMode(D5, OUTPUT);
-    pinMode(D6, OUTPUT);
-    pinMode(D7, OUTPUT);
-    pinMode(D8, OUTPUT);
+    	pinMode(D2, OUTPUT);
+    	pinMode(D3, OUTPUT);
+    	pinMode(D4, OUTPUT);
+    	pinMode(D5, OUTPUT);
+    	pinMode(D6, OUTPUT);
+    	pinMode(D7, OUTPUT);
+    	pinMode(D8, OUTPUT);
 
-    length = sizeof(locTable) / sizeof(locTable[0]);
+    	length = sizeof(locTable) / sizeof(locTable[0]);
 
-    //lcd.init();
-    //lcd.backlight();
-    Serial.println("Backlight enabled.");
+    	lcd.init();
+    	lcd.backlight();
+    	Serial.println("Backlight enabled.");
 
-    //updateLcd();
+    	updateLcd();
 }
 
 int lastNext = HIGH;
@@ -239,25 +234,25 @@ int lastSelect = HIGH;
 /// UPDATE PROCEDURE
 ///
 void loop(void) {
-    int next = digitalRead(A0);
-    int prev = digitalRead(A1);
-    int select = digitalRead(A2);
+    	int next = digitalRead(A0);
+    	int prev = digitalRead(A1);
+    	int select = digitalRead(A2);
 
-    if (next != lastNext && next == LOW) {
-        selected++;
-        resetLeds();
-        //updateLcd();
-    }
-    if (prev != lastPrev && prev == LOW) {
-        selected--;
-        resetLeds();
-        //updateLcd();
-    }
-    if (select != lastSelect && select == LOW) {
-        writeLeds();
-    }
+    	if (next != lastNext && next == LOW) {
+        	selected++;
+        	resetLeds();
+        	updateLcd();
+    	}
+    	if (prev != lastPrev && prev == LOW) {
+        	selected--;
+        	resetLeds();
+        	updateLcd();
+    	}
+    	if (select != lastSelect && select == LOW) {
+        	writeLeds();
+    	}
 
-    lastNext = next;
-    lastPrev = prev;
-    lastSelect = select;
+    	lastNext = next;
+    	lastPrev = prev;
+    	lastSelect = select;
 }
